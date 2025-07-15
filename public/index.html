@@ -1,3 +1,6 @@
+<!-- Luis Henrique da Costa Silva -->
+<!-- Matrícula: 562503 -->
+ 
 <!DOCTYPE html>
 <html lang="pt-br">
   <head>
@@ -6,12 +9,27 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>👥 Lista de Usuários com Paginação</h1>
+    <div class ="nav">
+      <h3 class="nav-titulo">📊 Sistemas e Mídias Digitais</h3>
+
     <menu>
-      <a href="cadastra_usuario.html" rel="noopener noreferrer"
-        >Cadastrar Usuário</a
-      >
+      <a href="cadastra_usuario.html" class="cadastro" rel="noopener noreferrer"
+        >Cadastrar Usuário</a>
     </menu>
+    </div>
+
+    <div class ="hero">
+      <video autoplay muted loop class="hero-video" >
+        <source src="img/data.mp4" type="video/mp4">
+      </video>
+      <div class ="hero-cont">
+        <h1> AUTORAÇÃO MULTIMÍDIA II</h1>
+        <h3>Lista de Usuários com Paginação</h3>
+      </div>
+    </div>
+
+    <div class ="tabela">
+    <h2>Usuários Cadastrados</h2>
     <table id="tabelaUsuarios">
       <thead>
         <tr>
@@ -19,11 +37,12 @@
           <th onclick="ordenarTabela('idade')">Idade ⬍</th>
           <th>Endereço</th>
           <th>Email</th>
+          <th class="act">Editar / Excluir</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
-
+    </div>
     <div class="paginacao">
       <button onclick="paginaAnterior()">⬅ Anterior</button>
       Página <span id="paginaAtual">1</span> de <span id="totalPaginas">1</span>

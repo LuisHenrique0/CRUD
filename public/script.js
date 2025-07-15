@@ -12,14 +12,9 @@ let ordemAtual = { campo: "nome", crescente: true };
 
 // Função assíncrona que carrega os usuários da API
 async function carregarUsuarios() {
-  // Faz uma requisição para a API que retorna 200 usuários
-  const resposta = await fetch("http://10.102.224.72:5000/list-users/200"); //Testar passando como parâmetro 1000000
-
-  // Converte a resposta em JSON e armazena no array global
+  const resposta = await fetch("http://localhost:3000/list-users/1000");
   usuarios = await resposta.json();
-
-  // Atualiza a interface com os dados recebidos
-  atualizarPaginacao();
+  atualizarPaginacao(); 
 }
 
 // Função que compara duas strings, com ou sem normalização completa
@@ -126,14 +121,63 @@ function renderizarTabela(data) {
 
   // Insere uma linha HTML para cada usuário no array recebido
   data.forEach((u) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${u.nome}</td>
-        <td>${u.idade}</td>
-        <td>${u.endereco}</td>
-        <td>${u.email}</td>
-      </tr>`;
+    const tr = document.createElement("tr");
+    tr.setAttribute("data-id", u.id); 
+    tr.innerHTML = `
+      <td>${u.nome}</td>
+      <td>${u.idade}</td>
+      <td>${u.endereco}</td>
+      <td>${u.email}</td>
+      <td class="acoes">
+        <a href="editar_usuario.html?id=${u.id}" class="btn-editar">
+          <button class="editar-btn">Editar</button>
+        </a>
+        <button class="excluir-btn" data-id="${u.id}">Excluir</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
   });
+
+  // Botões de exclusão
+  document.querySelectorAll('.excluir-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      const userId = this.getAttribute('data-id');
+      deletarUsuario(userId);
+    });
+  });
+}
+
+// Função de exclusão 
+async function deletarUsuario(userId) {
+  try {
+    const response = await fetch(`http://localhost:3000/deletar-usuario?id=${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.error || "Erro ao deletar usuário");
+    }
+
+    const data = await response.json();
+    console.log("Sucesso:", data);
+
+  
+    const linha = document.querySelector(`tr[data-id="${userId}"]`);
+    if (linha) linha.remove();
+
+    // Atualiza o array e UI
+    usuarios = usuarios.filter(u => u.id !== userId);
+    atualizarPaginacao();
+
+  } catch (error) {
+    console.error("Erro completo:", error);
+    alert(`Falha: ${error.message}`);
+  }
   // Existe esta outra forma de iterar os elementos desse vetor de objetos:
   //  for(u of data){
   //       tbody.innerHTML += `
