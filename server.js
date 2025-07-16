@@ -86,6 +86,23 @@ app.post("/cadastrar-usuario", (req, res) => {
   });
 });
 
+app.get("/obter-usuario", (req, res) => {
+  const userId = req.query.id; 
+  const usuario = usuarios.find((u) => u.id === userId);
+
+  if (usuario) {
+    res.json({
+      ok: true,
+      usuario: usuario,
+    });
+  } else {
+    res.status(404).json({
+      ok: false,
+      message: "Usuário não encontrado",
+    });
+  }
+});
+
 // Editar Usuário
 app.put("/editar-usuario", (req, res) => {
   const userId = req.body.id;
@@ -108,6 +125,7 @@ app.put("/editar-usuario", (req, res) => {
       usuario: usuarios[index],
     });
   } else {
+    console.error("Usuário não encontrado:", userId);
     res.status(404).json({
       ok: false,
       message: "Usuário não encontrado",
