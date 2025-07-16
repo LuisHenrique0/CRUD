@@ -9,18 +9,18 @@
   <body>
     <h1>Editar Usuário</h1>
 
-    <div class = "cont">
-    <form id="formulario" class="form">
-      <input type="text" id="nome" placeholder="Nome" required />
-      <input type="number" id="idade" placeholder="Idade" required />
-      <input type="text" id="endereco" placeholder="Endereço" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <button type="submit">Salvar Alterações</button>
-    </form>
-    <div id="mensagem"></div>
-    <div class="navegacao_paginas">
-      <a href="index.html">Retornar ao Home</a>
-    </div>
+    <div class="cont">
+      <form id="formulario" class="form">
+        <input type="text" id="nome" placeholder="Nome" required />
+        <input type="number" id="idade" placeholder="Idade" required />
+        <input type="text" id="endereco" placeholder="Endereço" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <button type="submit">Salvar Alterações</button>
+      </form>
+      <div id="mensagem"></div>
+      <div class="navegacao_paginas">
+        <a href="index.html">Retornar ao Home</a>
+      </div>
     </div>
     <script>
       const urlParams = new URLSearchParams(window.location.search);
@@ -32,25 +32,26 @@
       const emailInput = document.getElementById("email");
       const mensagem = document.getElementById("mensagem");
 
-      // Buscar dados do usuário utilizando fetch
+      // Busca os dados do usuário
       async function carregarUsuario() {
         try {
-          const resp = await fetch(`http://localhost:3000/obter-usuario?id=${userId}`);
+          const resp = await fetch(
+            `http://localhost:3000/obter-usuario?id=${userId}`
+          );
           const data = await resp.json();
           if (!data.ok) throw new Error(data.message);
 
-          // Preenche os campos com os dados já existentes
+          // Coloca os dados dos usuáriosnos campos de edição
           nomeInput.value = data.usuario.nome;
           idadeInput.value = data.usuario.idade;
           enderecoInput.value = data.usuario.endereco;
           emailInput.value = data.usuario.email;
-
         } catch (err) {
           mensagem.textContent = "Erro ao carregar usuário: " + err.message;
         }
       }
 
-      // Submeter a edição
+      // Faz a alteração dos dados do usuário
       const formulario = document.getElementById("formulario");
       formulario.addEventListener("submit", async (event) => {
         event.preventDefault();
@@ -60,14 +61,14 @@
           nome: nomeInput.value,
           idade: idadeInput.value,
           endereco: enderecoInput.value,
-          email: emailInput.value
+          email: emailInput.value,
         };
 
         try {
           const resp = await fetch("http://localhost:3000/editar-usuario", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(usuarioAtualizado)
+            body: JSON.stringify(usuarioAtualizado),
           });
 
           const data = await resp.json();
@@ -79,7 +80,6 @@
         }
       });
 
-      // Carrega ao abrir a página
       window.onload = carregarUsuario;
     </script>
   </body>

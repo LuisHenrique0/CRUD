@@ -3,27 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="edit.css" /> <!-- Mesmo css que editar usuários, pq são basicamente os mesmos elementos-->
+    <link rel="stylesheet" href="edit.css" />
+    <!-- Mesmo css que editar usuários, pq são basicamente os mesmos elementos-->
     <title>Cadastra Usuários</title>
   </head>
   <body>
-
     <h1>Cadastrar Usuários</h1>
 
     <div class="cont">
-    <form id="formulario">
-      <!-- Campos do formulário -->
-      <input type="text" id="nome" placeholder="Nome" />
-      <input type="number" id="idade" placeholder="Idade" />
-      <input type="text" id="endereco" placeholder="Endereço" />
-      <input type="email" id="email" placeholder="Email" />
-      <button type="submit">Cadastrar</button>
-    </form>
-    <div id="mensagem"></div>
-    <div id="novoUsuario"></div>
-    <div class="navegacao_paginas">
-      <a href="index.html">Retornar ao Home</a>
-    </div>
+      <form id="formulario">
+        <!-- Campos do formulário -->
+        <input type="text" id="nome" placeholder="Nome" />
+        <input type="number" id="idade" placeholder="Idade" />
+        <input type="text" id="endereco" placeholder="Endereço" />
+        <input type="email" id="email" placeholder="Email" />
+        <button type="submit">Cadastrar</button>
+      </form>
+      <div id="mensagem"></div>
+      <div id="novoUsuario"></div>
+      <div class="navegacao_paginas">
+        <a href="index.html">Retornar ao Home</a>
+      </div>
     </div>
     <script>
       const formulario = document.getElementById("formulario");
@@ -57,14 +57,15 @@
               mensagem.textContent = "Erro ao cadastrar usuário.";
             }
           })
-           .then((data) => { // Processa a resposta da API
-               const mensagem = document.getElementById("mensagem");
-               if (data.ok) {
-                 mensagem.textContent = "Usuário cadastrado com sucesso!";
-               } else {
-                 mensagem.textContent = "Erro ao cadastrar usuário.";
-               }
-             })
+          .then((data) => {
+            // Processa a resposta da API
+            const mensagem = document.getElementById("mensagem");
+            if (data.ok) {
+              mensagem.textContent = "Usuário cadastrado com sucesso!";
+            } else {
+              mensagem.textContent = "Erro ao cadastrar usuário.";
+            }
+          })
           .catch((error) => {
             console.error("Erro:", error);
           });

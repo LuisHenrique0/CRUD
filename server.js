@@ -15,28 +15,19 @@ const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json()); //ativa parser JSON para este projeto
-app.use(express.urlencoded({ extended: true }));
+
 // Configura o Express para servir arquivos estáticos da pasta "public"
 // Isso permite acessar arquivos como index.html diretamente
 app.use(express.static(path.join(__dirname, "public")));
 
 // Ativa o CORS para permitir chamadas HTTP de outras origens (por exemplo, frontend em outro servidor)
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-}));
-// Para logs, retornando data,hora e etc junto do método e da url
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  next();
-});
+app.use(cors());
 
 /**
  * Função que lê o arquivo usuarios.json e retorna até 'qtd' usuários
  * Se houver erro na leitura, retorna um array vazio
  */
-function lerUsuarios(max=0) {
+function lerUsuarios(max = 0) {
   try {
     const dados = fs.readFileSync("usuarios.json", "utf-8"); // Lê o conteúdo do arquivo
     const usuarios = JSON.parse(dados); // Converte a string JSON em array de objetos
@@ -95,6 +86,61 @@ app.post("/cadastrar-usuario", (req, res) => {
   });
 });
 
+// Editar Usuário
+app.put("/editar-usuario", (req, res) => {
+  const userId = req.body.id;
+  const index = usuarios.findIndex((u) => u.id === userId);
+
+  if (index !== -1) {
+    usuarios[index] = {
+      ...usuarios[index],
+      nome: req.body.nome,
+      idade: req.body.idade,
+      endereco: req.body.endereco,
+      email: req.body.email,
+    };
+
+    salvarUsuarios(usuarios);
+
+    res.json({
+      ok: true,
+      message: "Usuário atualizado com sucesso!",
+      usuario: usuarios[index],
+    });
+  } else {
+    res.status(404).json({
+      ok: false,
+      message: "Usuário não encontrado",
+    });
+  }
+});
+
+// Deletar Usuário
+app.delete("/deletar-usuario", (req, res) => {
+  try {
+    if (!req.query.id) {
+      return res.status(400).json({ error: "ID não fornecido" });
+    }
+
+    const userId = req.query.id;
+
+    usuarios = lerUsuarios();
+    const index = usuarios.findIndex((u) => u.id === userId);
+
+    if (index === -1) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    usuarios.splice(index, 1);
+    salvarUsuarios(usuarios);
+
+    return res.json({ success: true, message: "Usuário foi deletado!" });
+  } catch (error) {
+    console.error("Erro:", error.message);
+    return res.status(500).json({ error: "Erro interno no servidor" });
+  }
+});
+
 // Rota "/list-users/:count?"
 // Retorna um JSON com até 'count' usuários do arquivo usuarios.json
 app.get("/list-users/:count?", (req, res) => {
@@ -107,87 +153,6 @@ app.get("/list-users/:count?", (req, res) => {
   console.log(num);
   // Envia os usuários lidos como resposta JSON
   res.json(lerUsuarios(num));
-});
-
-// Rota para obter um usuário específico(get, necessário para o update e delete)
-app.get("/obter-usuario", (req, res) => {
-  const userId = req.query.id;
-  const usuario = usuarios.find(u => u.id === userId);
-  
-  if (usuario) {
-    res.json({
-      ok: true,
-      usuario: usuario
-    });
-  } else {
-    res.status(404).json({
-      ok: false,
-      message: "Usuário não encontrado"
-    });
-  }
-});
-
-// Editar usuário
-app.put("/editar-usuario", (req, res) => {
-  const userId = req.body.id;
-  const index = usuarios.findIndex(u => u.id === userId);
-  
-  if (index !== -1) {
-    usuarios[index] = {
-      ...usuarios[index],
-      nome: req.body.nome,
-      idade: req.body.idade,
-      endereco: req.body.endereco,
-      email: req.body.email
-    };
-    
-    salvarUsuarios(usuarios);
-    
-    res.json({
-      ok: true,
-      message: "Usuário atualizado com sucesso!",
-      usuario: usuarios[index]
-    });
-  } else {
-    res.status(404).json({
-      ok: false,
-      message: "Usuário não encontrado"
-    });
-  }
-});
-
-
-// Deletar usuário
-app.delete("/deletar-usuario", (req, res) => {
-  try {
-    if (!req.query.id) {
-      return res.status(400).json({ error: "ID não fornecido" });
-    }
-
-    const userId = req.query.id;
-
-    usuarios = lerUsuarios();
-    const index = usuarios.findIndex(u => u.id === userId);
-
-    if (index === -1) {
-      return res.status(404).json({ error: "Usuário não encontrado" });
-    }
-
-    usuarios.splice(index, 1);
-    salvarUsuarios(usuarios);
-
-    return res.json({ success: true, message: "Usuário deletado com sucesso!" });
-
-  } catch (error) {
-    console.error("❌ Erro:", error.message);
-    return res.status(500).json({ error: "Erro interno no servidor" });
-  }
-});
-
-
-app.use((req, res) => {
-  console.log(`❌ Rota não encontrada: ${req.method} ${req.originalUrl}`);
-  res.status(404).json({ error: "Rota não encontrada" });
 });
 
 // Inicia o servidor e exibe a URL no console
